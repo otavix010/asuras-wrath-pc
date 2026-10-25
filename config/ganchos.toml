@@ -1,10 +1,10 @@
 # Asura's Wrath: hooks in the game's code (src/)
 
-# Frame rate (src/frame_rate.h): the presentation interval the game asks the GPU for, 2 vertical blanks (30 fps),
-# becomes 1 (60 fps) when fps = 60
+# Frame rate (src/port/frame_rate.h): the presentation interval the XDK's D3D hands the GPU, 2 vertical blanks
+# (30 fps), becomes 1 at 60 fps or more
 [[midasm_hook]]
 address = 0x8299A70C
-name = "AwPresentInterval"
+name = "PortPresentInterval"
 registers = ["r11"]
 after_instruction = true
 

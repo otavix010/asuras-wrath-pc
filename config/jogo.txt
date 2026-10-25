@@ -1,3 +1,12 @@
 titulo=Asura's Wrath
 versao=Asura's Wrath (World)
 sha1_xex=bcaec56eabad135071ee879b4bbcc6aa1e3362b8
+title_id=43430817
+cor=210,110,40
+marca=Capcom
+iso_gb=8
+fps=30,60,120,144
+fps_original=30
+fps_padrao=60
+idiomas=1,5,4,3,6,2
+credito=boma (xenia-canary/game-patches)|achou onde o jogo trava os 30 fps|found where the game holds 30 fps|encontró dónde el juego fija los 30 fps
