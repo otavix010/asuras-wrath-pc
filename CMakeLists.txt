@@ -22,3 +22,6 @@ else()
 endif()
 
 rexglue_setup_target(asuraswrath GPU_PLUGINS xenos)
+
+# the linker map names the frames of falha.log (scripts/pilha.py)
+target_link_options(asuraswrath PRIVATE "LINKER:/MAP:${CMAKE_CURRENT_BINARY_DIR}/asuraswrath.map")

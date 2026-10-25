@@ -34,8 +34,28 @@ def move_left(pid):
 
     user32.EnumWindows(each, 0)
     for hwnd in found:
-        user32.SetWindowPos(hwnd, None, -1360, 80, 0, 0, 0x15)  # NOSIZE | NOZORDER | NOACTIVATE
+        # the whole window on the left monitor (1080x1920 at x=-1080): 1080 wide, 16:9
+        user32.SetWindowPos(hwnd, None, -1080, 300, 1080, 640, 0x14)  # NOZORDER | NOACTIVATE
     return bool(found)
+
+
+def window_state(pid):
+    """(x, y, w, h, maximized) of the process's visible windows"""
+    user32 = ctypes.windll.user32
+    out = []
+
+    @ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.c_void_p, ctypes.c_void_p)
+    def each(hwnd, _):
+        owner = ctypes.c_ulong()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(owner))
+        if owner.value == pid and user32.IsWindowVisible(hwnd):
+            r = (ctypes.c_long * 4)()
+            user32.GetWindowRect(hwnd, r)
+            out.append((r[0], r[1], r[2] - r[0], r[3] - r[1], bool(user32.IsZoomed(hwnd))))
+        return True
+
+    user32.EnumWindows(each, 0)
+    return out
 
 
 def run(seconds):

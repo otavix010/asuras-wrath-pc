@@ -7,3 +7,7 @@ out/
 *.log
 codegen.out
 tela_*.png
+jogar/
+folha.png
+corte.png
+__pycache__/
