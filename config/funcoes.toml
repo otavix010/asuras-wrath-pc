@@ -187,3 +187,10 @@
 0x82D64090 = {}
 0x82D64098 = {}
 0x82E17080 = {}
+
+# addresses the code builds (lis + addi/ori) at plausible function starts (scripts/varrer_ponteiros.py)
+0x82839BF8 = {}
+0x828C5B20 = {}
+0x82AD1B00 = {}
+0x82BEE060 = {}
+0x82CB6948 = {}
