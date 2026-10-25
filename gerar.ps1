@@ -219,8 +219,19 @@ Etapa 4 '4_compilar' {
     $vs = Achar-VS
     $build = Join-Path $R 'out\build\win-amd64-release'
     Remove-Item -Recurse -Force $build -ErrorAction SilentlyContinue
-    $cfg = "cmake --preset win-amd64-release -DCMAKE_C_COMPILER=`"$LLVM\bin\clang.exe`" -DCMAKE_CXX_COMPILER=`"$LLVM\bin\clang++.exe`" -DCMAKE_PREFIX_PATH=`"$SDK`" -DPORT_CPU_NATIVO=ON"
-    Exec "call `"$vs\Common7\Tools\VsDevCmd.bat`" -arch=amd64 -host_arch=amd64 >nul && set `"PATH=$LLVM\bin;%PATH%`" && cd /d `"$R`" && $cfg && cmake --build out\build\win-amd64-release --parallel $Jobs"
+    # a script of its own, one command a line: cmd reads each line when it runs it, so the PATH the Visual Studio's
+    # environment sets is the one the next lines see (and the whole build's output goes to the step's log)
+    $script = Join-Path $OUT 'compilar.cmd'
+    $linhas = @(
+        '@echo off',
+        "call `"$vs\Common7\Tools\VsDevCmd.bat`" -arch=amd64 -host_arch=amd64 >nul",
+        "set `"PATH=$LLVM\bin;%PATH%`"",
+        "cd /d `"$R`"",
+        "cmake --preset win-amd64-release -DCMAKE_C_COMPILER=`"$LLVM\bin\clang.exe`" -DCMAKE_CXX_COMPILER=`"$LLVM\bin\clang++.exe`" -DCMAKE_PREFIX_PATH=`"$SDK`" -DPORT_CPU_NATIVO=ON || exit /b 1",
+        "cmake --build out\build\win-amd64-release --parallel $Jobs || exit /b 1"
+    )
+    [IO.File]::WriteAllLines($script, $linhas, (New-Object Text.UTF8Encoding($false)))
+    Exec "`"$script`""
     if (-not (Test-Path (Join-Path $build "$PROJETO.exe"))) { throw "a compilação não gerou o $PROJETO.exe" }
 }
 
