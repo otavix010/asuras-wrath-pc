@@ -44,11 +44,12 @@ def lines(path):
         return []
 
 
-def start(label, env, fps_overlay=True):
+def start(label, env, fps_overlay=True, seconds=1500):
     """the game started with env and Episode 4 begun (the moment Yes is pressed): its rodar.py process, or None"""
     subprocess.run(['taskkill', '/F', '/IM', EXE.name], capture_output=True)
     wait(3)
-    args = [sys.executable, '-I', str(ROOT / 'scripts' / 'rodar.py'), '--segundos', '1500', '--prints', '1499',
+    args = [sys.executable, '-I', str(ROOT / 'scripts' / 'rodar.py'), '--segundos', str(seconds), '--prints',
+            str(seconds - 1),
             '--pad', '45:START', '--var', f'REX_MOSTRAR_FPS={"true" if fps_overlay else "false"}']
     for item in env:
         args += ['--var', item]
