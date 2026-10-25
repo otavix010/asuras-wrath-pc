@@ -40,11 +40,12 @@ def _windows(pid):
     return found
 
 
-def move_left(pid):
-    """the whole window on the left monitor (1080x1920 at x=-1080): 1080 wide, 16:9, away from the main one"""
+def move_left(pid, y=300):
+    """the whole window on the left monitor (1080x1920 at x=-1080): 1080 wide, 16:9, away from the main one; two fit
+    one above the other (y=300 and y=1000)"""
     found = _windows(pid)
     for hwnd in found:
-        ctypes.windll.user32.SetWindowPos(hwnd, None, -1080, 300, 1080, 640, 0x14)  # NOZORDER | NOACTIVATE
+        ctypes.windll.user32.SetWindowPos(hwnd, None, -1080, y, 1080, 640, 0x14)  # NOZORDER | NOACTIVATE
     return bool(found)
 
 
