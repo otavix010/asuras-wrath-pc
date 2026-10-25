@@ -44,7 +44,7 @@ def lines(path):
         return []
 
 
-def start(label, env, fps_overlay=True, seconds=1500):
+def start(label, env, fps_overlay=True, seconds=1500, episode=4):
     """the game started with env and Episode 4 begun (the moment Yes is pressed): its rodar.py process, or None"""
     subprocess.run(['taskkill', '/F', '/IM', EXE.name], capture_output=True)
     wait(3)
@@ -56,7 +56,7 @@ def start(label, env, fps_overlay=True, seconds=1500):
     game = subprocess.Popen(args, cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     wait(72)
     # the notice, then the title's EPISODE MENU (marked when there is a save), confirmed by the list's
-    # EASY/NORMAL/HARD heading; the list does not wrap, so 5 up and 3 down is Episode 4 wherever the mark was;
+    # EASY/NORMAL/HARD heading; the list does not wrap, so 6 up and episode - 1 down is that episode wherever the mark was;
     # then PLAY, and Yes on "Start episode?" (No is marked)
     press('A', 0.2)
     wait(8)
@@ -66,7 +66,7 @@ def start(label, env, fps_overlay=True, seconds=1500):
         print(f'[{label}] o menu de episódios não abriu; rodada descartada', flush=True)
         game.kill()
         return None
-    for button, after in [('UP', 0.6)] * 5 + [('DOWN', 0.6)] * 3 + [('A', 2.5), ('A', 2.5), ('UP', 0.8)]:
+    for button, after in [('UP', 0.6)] * 6 + [('DOWN', 0.6)] * (episode - 1) + [('A', 2.5), ('A', 2.5), ('UP', 0.8)]:
         press(button, 0.15 if button in ('UP', 'DOWN') else 0.2)
         wait(after)
     press('A', 0.2)
