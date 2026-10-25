@@ -13,3 +13,5 @@ corte.png
 __pycache__/
 pilha.txt
 iso.txt
+folha*.png
+*.png
