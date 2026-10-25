@@ -21,6 +21,7 @@
 #include "crash_log.h"
 #include "fps_overlay.h"
 #include "frame_rate.h"
+#include "input_lock.h"
 #include "pad_script.h"
 
 REXCVAR_DEFINE_STRING(iso, "", "Port",
