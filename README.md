@@ -8,6 +8,8 @@ O runtime vem de uma compilação própria da ReXGlue com o AMD FidelityFX e cor
 
 O jeito mais fácil de jogar é pelo [Otavix Launcher](https://github.com/otavix010/otavix-launcher), que baixa este port, pede a sua `.iso`, gera tudo e cuida das opções.
 
+![Luta com BURST](docs/jogo.jpg)
+
 ## O que o port acrescenta
 
 | | Xbox 360 | Port |
@@ -20,6 +22,10 @@ O jeito mais fácil de jogar é pelo [Otavix Launcher](https://github.com/otavix
 | Contador de fps | — | opcional, no canto da tela |
 
 DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos de Xbox 360 não fornecem. O ganho de nitidez vem da resolução interna (supersampling de verdade), e a fluidez vem dos fps reais.
+
+| Tela de título | Asura |
+|---|---|
+| ![Tela de título](docs/cena1.jpg) | ![Asura](docs/cena2.jpg) |
 
 ## Estado dos testes
 
