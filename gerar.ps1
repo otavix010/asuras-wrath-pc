@@ -45,7 +45,11 @@ $SDK_VERSAO = '0.10.0.24'
 $SDK_URL = 'https://github.com/rexglue/rexglue-sdk/releases/download/nightly-20261002-bd833a2a/rexglue-sdk-0.10.0.24-dev.gbd833a2-win-amd64.zip'
 $SDK_SHA256 = '1e19d7ec9be0d9d7e1a0088a34a33b068d4dea520181e81318528ef3b37627e7'
 $LLVM_VERSAO = '23.1.3'
-$LLVM_URL = "https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSAO/clang%2Bllvm-$LLVM_VERSAO-x86_64-pc-windows-msvc.tar"
+$LLVM_URL = "https://github.com/llvm/llvm-project/releases/download/llvmorg-$LLVM_VERSAO/clang%2Bllvm-$LLVM_VERSAO-x86_64-pc-windows-msvc.tar.zst"
+$LLVM_SHA256 = '7e69dc07a4536b79ff24a651a2611990bf8eaab17ea560f1092707c4f31ba01d'
+# the package's zstd frames need a long window, more than tar's own decoder takes: the official zstd unpacks it
+$ZSTD_URL = 'https://github.com/facebook/zstd/releases/download/v1.5.7/zstd-v1.5.7-win64.zip'
+$ZSTD_SHA256 = 'acb4e8111511749dc7a3ebedca9b04190e37a17afeb73f55d4425dbf0b90fad9'
 
 $FERRAMENTAS = Join-Path (Split-Path $R) '_ferramentas'
 $SDK = Join-Path $FERRAMENTAS "rexglue-sdk-$SDK_VERSAO"
@@ -159,18 +163,33 @@ Etapa 1 '1_ferramentas' {
         Remove-Item -Recurse -Force $tmp, $zip
     }
     if (-not (Test-Path (Join-Path $LLVM 'bin\clang++.exe'))) {
-        # the zstd package is a third of the xz one; Windows 10's tar reads only xz
-        $tarexe = "$env:SystemRoot\System32\tar.exe"
-        $ext = if ((& $tarexe --version) -match 'libzstd') { 'zst' } else { 'xz' }
-        $pacote = Join-Path $FERRAMENTAS "llvm-$LLVM_VERSAO.tar.$ext"
-        if (-not (Test-Path $pacote)) { Baixar "$LLVM_URL.$ext" $pacote }
+        $zstd = Join-Path $FERRAMENTAS 'zstd\zstd.exe'
+        if (-not (Test-Path $zstd)) {
+            $zip = Join-Path $FERRAMENTAS 'zstd.zip'
+            Baixar $ZSTD_URL $zip
+            if ((Get-FileHash $zip -Algorithm SHA256).Hash -ne $ZSTD_SHA256) { throw "o zstd baixado não confere (SHA-256): $zip" }
+            $tmp = Join-Path $FERRAMENTAS 'zstd.tmp'
+            Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
+            Expand-Archive $zip $tmp
+            New-Item -ItemType Directory -Force (Split-Path $zstd) | Out-Null
+            Move-Item (Get-ChildItem $tmp -Recurse -Filter zstd.exe | Select-Object -First 1).FullName $zstd
+            Remove-Item -Recurse -Force $tmp, $zip
+        }
+        $pacote = Join-Path $FERRAMENTAS "llvm-$LLVM_VERSAO.tar.zst"
+        if (-not (Test-Path $pacote) -or (Get-FileHash $pacote -Algorithm SHA256).Hash -ne $LLVM_SHA256) { Baixar $LLVM_URL $pacote }
+        if ((Get-FileHash $pacote -Algorithm SHA256).Hash -ne $LLVM_SHA256) { throw "o LLVM baixado não confere (SHA-256): $pacote" }
         $tmp = Join-Path $FERRAMENTAS 'llvm.tmp'
         Remove-Item -Recurse -Force $tmp -ErrorAction SilentlyContinue
         New-Item -ItemType Directory $tmp | Out-Null
+        # only what a port's build runs: the compiler, the linker, the archiver and the compiler's own headers
+        # (about 370 MB of the package's 4 GB)
         Msg 'extraindo o LLVM ...'
-        Exec "`"$tarexe`" -xf `"$pacote`" -C `"$tmp`""
+        $quais = @('*/bin/clang.exe', '*/bin/clang++.exe', '*/bin/lld-link.exe', '*/bin/llvm-ar.exe', '*/bin/llvm-ranlib.exe', '*/lib/clang/*') |
+            ForEach-Object { "--include `"$_`"" }
+        Exec "`"$zstd`" -dc --long=31 `"$pacote`" | `"$env:SystemRoot\System32\tar.exe`" -xf - -C `"$tmp`" $($quais -join ' ')"
         Remove-Item -Recurse -Force $LLVM -ErrorAction SilentlyContinue
         Move-Item (Get-ChildItem $tmp -Directory | Select-Object -First 1).FullName $LLVM
+        if (-not (Test-Path (Join-Path $LLVM 'bin\clang++.exe'))) { throw 'o LLVM extraído não tem o clang++' }
         Remove-Item -Recurse -Force $tmp, $pacote
     }
 }
