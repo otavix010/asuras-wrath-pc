@@ -50,15 +50,16 @@ Ficam em `asuraswrath.toml` ao lado do executável, ou no arquivo indicado pela 
 
 ## Como funciona
 
-- `config/asuraswrath.toml`: as funções que a análise estática não acha sozinha (chamadas só por ponteiro) e os ganchos no código do jogo.
+- `config/funcoes.toml`: as funções que a análise estática não acha sozinha (chamadas só por ponteiro). `config/ganchos.toml`: os ganchos no código do jogo. `config/jogo.txt`: a versão do jogo que o gerador confere.
 - `src/frame_rate.h`: os dois pontos que prendem o jogo em 30 fps viram uma opção. O intervalo de apresentação de 2 vblanks passa a 1, e o teto de tick do motor fica sem limite. Acima de 60, o vblank do console emulado também acelera.
-- `src/input_lock.h`: corrige uma corrida da ReXGlue. A lista de controles é refeita a cada leitura sem trava, e a leitura do controle num thread junto com a vibração em outro corrompia o heap.
-- `src/port_options.h`: as opções de imagem e os padrões do port.
-- `src/fps_overlay.h`: o contador, que conta cada quadro entregue à GPU.
-- `src/crash_log.h`: em caso de falha, grava `falha.log` com a pilha. `scripts/pilha.py` dá nome aos quadros.
+- `src/port/`: a base comum dos ports de Xbox 360 (a mesma em todos).
+- `src/port/input_lock.h`: corrige uma corrida da ReXGlue. A lista de controles é refeita a cada leitura sem trava, e a leitura do controle num thread junto com a vibração em outro corrompia o heap.
+- `src/port/port_options.h`: as opções de imagem e os padrões do port.
+- `src/port/fps_overlay.h`: o contador, que conta cada quadro entregue à GPU.
+- `src/port/crash_log.h`: em caso de falha, grava `falha.log` com a pilha. `scripts/pilha.py` dá nome aos quadros.
 - O app também lê a `.iso` direto (`iso`). As caixas de mensagem do sistema, que só aceitam teclado e mouse, são respondidas com o botão padrão (`headless`).
 
-Para desenvolver: `build.cmd` compila; `scripts/rodar.py` roda numa janela com prints e um controle roteirizado (`AW_PAD`); `scripts/tecla.py` aperta botões no jogo em execução.
+Para desenvolver: `build.cmd` compila; `scripts/rodar.py` roda numa janela com prints, o fps de cada segundo e um controle roteirizado (`PORT_PAD`; para começar um jogo novo: `--pad 45:START,58:A,64:A,67:A,70:UP,72.5:A`); `scripts/tecla.py` aperta botões no jogo em execução.
 
 ## Créditos
 

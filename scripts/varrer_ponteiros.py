@@ -1,19 +1,20 @@
 """Finds functions reached only through pointers kept in data: every aligned word of the image outside the code that
-points into the code, at a plausible function start not yet known, goes into config/asuraswrath.toml.
+points into the code, at a plausible function start not yet known, goes into config/funcoes.toml.
 
     py -3 scripts/varrer_ponteiros.py imagem.bin [--gravar]
 
-imagem.bin: the loaded image (AW_DUMP_IMAGE=file on a run). A plausible start: the word before is a return (blr),
-an unconditional branch or padding, or the word itself opens a frame (mflr r12, stwu r1)."""
+imagem.bin: the loaded image (PORT_DUMP_IMAGE=file on a run). A plausible start: the word before is a return (blr,
+bctr), an unconditional branch or padding, or the word itself opens a frame (mflr r12, stwu r1)."""
 import re
 import struct
 import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
-PCH = ROOT / 'generated' / 'default' / 'asuraswrath_pch.h'
-REGISTER = ROOT / 'generated' / 'default' / 'asuraswrath_register.cpp'
-CONFIG = ROOT / 'config' / 'asuraswrath.toml'
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from port import FUNCS, GENERATED, NAME  # noqa: E402
+
+PCH = GENERATED / f'{NAME}_pch.h'
+REGISTER = GENERATED / f'{NAME}_register.cpp'
 
 
 def define(name):
@@ -26,7 +27,7 @@ def main():
     base, code, code_size = define('REX_IMAGE_BASE'), define('REX_CODE_BASE'), define('REX_CODE_SIZE')
     end = code + code_size
     known = {int(a, 16) for a in re.findall(r'SetFunction\(0x([0-9A-Fa-f]{8})', REGISTER.read_text())}
-    declared = {int(a, 16) for a in re.findall(r'^0x([0-9A-Fa-f]{8})\s*=', CONFIG.read_text(), re.M)}
+    declared = {int(a, 16) for a in re.findall(r'^0x([0-9A-Fa-f]{8})\s*=', FUNCS.read_text(), re.M)}
 
     def word(addr):
         o = addr - base
@@ -54,10 +55,10 @@ def main():
         print(f'  0x{v:08X} (ponteiro em 0x{found[v]:08X})')
     if write and found:
         lines = ''.join(f'0x{v:08X} = {{}}\n' for v in sorted(found))
-        CONFIG.write_text(CONFIG.read_text(encoding='utf-8').rstrip('\n') +
-                          '\n\n# pointers in data to plausible function starts (scripts/varrer_ponteiros.py)\n' + lines,
-                          encoding='utf-8')
-        print('gravadas em', CONFIG)
+        FUNCS.write_text(FUNCS.read_text(encoding='utf-8').rstrip('\n') +
+                         '\n\n# pointers in data to plausible function starts (scripts/varrer_ponteiros.py)\n' + lines,
+                         encoding='utf-8')
+        print('gravadas em', FUNCS)
 
 
 if __name__ == '__main__':

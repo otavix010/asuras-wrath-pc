@@ -1,6 +1,6 @@
 // mostrar_fps: the game's frame rate in the top-left corner, counted at each frame the game hands to the GPU (right
-// after its VdSwap, the midasm hook AwFrame in config/asuraswrath.toml) and shown twice a second.
-// Development: AW_FPS_LOG=file gets "<seconds since the start> <frames in that second>" once a second.
+// after its VdSwap, the midasm hook PortFrame in config/ganchos.toml) and shown twice a second.
+// Development: PORT_FPS_LOG=file gets "<seconds since the start> <frames in that second>" once a second.
 
 #pragma once
 
@@ -18,11 +18,11 @@ REXCVAR_DEFINE_BOOL(mostrar_fps, false, "Port", "Show the frame rate in the top-
 
 inline std::atomic<uint64_t> g_guest_frames{0};
 
-void AwFrame() {
+void PortFrame() {
   uint64_t frames = g_guest_frames.fetch_add(1, std::memory_order_relaxed) + 1;
   // the frames come from one guest thread, so the log's state needs no lock
   static FILE* log = [] {
-    const char* path = std::getenv("AW_FPS_LOG");
+    const char* path = std::getenv("PORT_FPS_LOG");
     return path ? std::fopen(path, "w") : nullptr;
   }();
   if (!log) return;

@@ -1,0 +1,14 @@
+# Asura's Wrath: hooks in the game's code (src/)
+
+# Frame rate (src/frame_rate.h): the presentation interval the game asks the GPU for, 2 vertical blanks (30 fps),
+# becomes 1 (60 fps) when fps = 60
+[[midasm_hook]]
+address = 0x8299A70C
+name = "AwPresentInterval"
+registers = ["r11"]
+after_instruction = true
+
+# A frame handed to the GPU (right after the game's VdSwap): counts the frame rate (src/port/fps_overlay.h)
+[[midasm_hook]]
+address = 0x8299B710
+name = "PortFrame"

@@ -1,7 +1,7 @@
 // fps = 30 (the original), 60 or more. Two places hold the game at 30, both found by boma for Xenia (game-patches,
 // "Unlock FPS"); here they are hooks that follow the option instead of bytes patched for good:
 //   0x8299A70C  li r11,2: the presentation interval handed to the GPU, 2 vertical blanks a frame; 1 at 60 fps
-//               (the midasm hook in config/asuraswrath.toml).
+//               (the midasm hook in config/ganchos.toml).
 //   sub_824D7110  the engine's tick-rate cap: 0 (none) unless a global flag is set, then a field of the engine
 //               (1224); at 60 fps always 0, the vertical blank alone paces the game.
 // Above 60 the console's vertical blank itself runs faster (video_mode_refresh_rate, unless set): 120 fps is a blank

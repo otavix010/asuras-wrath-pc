@@ -1,10 +1,10 @@
-// Development: AW_PAD scripts a controller for tests without a person at the pad (as the FIFA port's FS2_PAD).
-//   AW_PAD="12:START,14.5:A,20-22:LX-,40-300@3:A"
+// Development: PORT_PAD scripts a controller for tests without a person at the pad (as the FIFA port's FS2_PAD).
+//   PORT_PAD="12:START,14.5:A,20-22:LX-,40-300@3:A"
 //   at a second: a 0.15 s press; over a range: held; over a range @n: pressed every n seconds (@n/h: held h seconds).
 // Buttons: A B X Y LB RB LT RT START BACK UP DOWN LEFT RIGHT LS RS; sticks at full tilt: LX+ LX- LY+ LY- RX+ RX- RY+ RY-
 // (Y+ is up); LROT RROT turn a stick round clockwise, twice a second, LROT- RROT- the other way; several at once
 // joined by +, as LY-+RY- (both sticks down). Seconds count from the app's start.
-// AW_PAD_LIVE=file takes commands while the game runs: each line appended, "<seconds> <buttons>", holds them from then
+// PORT_PAD_LIVE=file takes commands while the game runs: each line appended, "<seconds> <buttons>", holds them from then
 // (scripts/tecla.py writes them).
 
 #pragma once
@@ -35,7 +35,7 @@ class ScriptedPad final : public rex::input::InputDriver {
   void EnumerateDevices(std::vector<rex::input::DeviceInfo>& out) override {
     rex::input::DeviceInfo info;
     info.id = kDevice;
-    info.name = "Roteiro (AW_PAD)";
+    info.name = "Roteiro (PORT_PAD)";
     out.push_back(info);
   }
 

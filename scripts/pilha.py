@@ -1,13 +1,15 @@
-"""Names the frames of falha.log: the port's from the linker map (asuraswrath.map), the DLLs' from their exports.
+"""Names the frames of falha.log: the port's from the linker map (<name>.map), the DLLs' from their exports.
 
     py -3 scripts/pilha.py [falha.log] [--pasta out/build/win-amd64-release]"""
 import argparse
 import bisect
 import re
 import struct
+import sys
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from port import BUILD, NAME  # noqa: E402
 
 
 def map_symbols(path):
@@ -70,7 +72,7 @@ def nearest(table, rva):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('log', nargs='?')
-    ap.add_argument('--pasta', default=str(ROOT / 'out/build/win-amd64-release'))
+    ap.add_argument('--pasta', default=str(BUILD))
     a = ap.parse_args()
     folder = Path(a.pasta)
     log = Path(a.log) if a.log else folder / 'falha.log'
@@ -83,8 +85,8 @@ def main():
         module, rva = m.group(2), int(m.group(3), 16)
         if module not in tables:
             f = folder / module
-            if module.lower() == 'asuraswrath.exe' and (folder / 'asuraswrath.map').exists():
-                tables[module] = map_symbols(folder / 'asuraswrath.map')
+            if module.lower() == f'{NAME}.exe' and (folder / f'{NAME}.map').exists():
+                tables[module] = map_symbols(folder / f'{NAME}.map')
             elif f.exists():
                 tables[module] = export_symbols(f)
             else:

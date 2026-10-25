@@ -1,0 +1,3 @@
+titulo=Asura's Wrath
+versao=Asura's Wrath (World)
+sha1_xex=bcaec56eabad135071ee879b4bbcc6aa1e3362b8

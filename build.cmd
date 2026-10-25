@@ -1,5 +1,6 @@
 @echo off
-rem Asura's Wrath port: configures (first time) and builds the release with the portable LLVM and the ReXGlue SDK.
+rem Xbox 360 port: configures (first time) and builds the release with the portable LLVM and the ReXGlue SDK.
+rem The same in every port (x360-ports\comum, copied by sincronizar.py).
 rem Usage: build.cmd [release|debug]
 setlocal
 set "CFG=%~1"

@@ -24,13 +24,13 @@ inline GuestFunc Original(const char* name) {
 
 }  // namespace input_lock
 
-#define AW_LOCKED_IMPORT(name)                                                             \
+#define PORT_LOCKED_IMPORT(name)                                                             \
   REX_HOOK_RAW(__imp__##name) {                                                            \
     static const input_lock::GuestFunc original = input_lock::Original("__imp__" #name);   \
     std::lock_guard<std::mutex> lock(input_lock::g_lock);                                  \
     original(ctx, base);                                                                   \
   }
 
-AW_LOCKED_IMPORT(XamInputGetState)
-AW_LOCKED_IMPORT(XamInputSetState)
-AW_LOCKED_IMPORT(XamInputGetCapabilities)
+PORT_LOCKED_IMPORT(XamInputGetState)
+PORT_LOCKED_IMPORT(XamInputSetState)
+PORT_LOCKED_IMPORT(XamInputGetCapabilities)

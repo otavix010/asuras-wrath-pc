@@ -1,26 +1,26 @@
 <#
 .SYNOPSIS
-  Gera e compila o Asura's Wrath a partir da SUA cópia do jogo (a .iso do Xbox 360).
+  Gera e compila o port a partir da SUA cópia do jogo (a .iso do Xbox 360).
 
 .DESCRIPTION
   Faz tudo em ordem, e cada etapa pula se já foi feita (use -RefazerDe N para refazer da etapa N em diante):
     1. ferramentas: o SDK ReXGlue e o LLVM (Clang) portátil, baixados para a pasta _ferramentas ao lado do port
        (compartilhada pelos ports de Xbox 360); confere o Visual Studio Build Tools (C++ e CMake);
-    2. jogo: lê o default.xex de dentro da .iso (a .iso fica onde está; o jogo a lê direto);
+    2. jogo: lê o default.xex de dentro da .iso e confere a versão (a .iso fica onde está; o jogo a lê direto);
     3. tradução: o código PowerPC do jogo vira C++ (generated\);
     4. compilação;
-    5. pronto para jogar.
-  Os logs de cada etapa ficam em out\gerar\.
+    5. pronto para jogar (jogar.cmd).
+  Os logs de cada etapa ficam em out\gerar\. O jogo e a versão esperada estão em config\jogo.txt.
 
 .PARAMETER Iso
-  A .iso do Asura's Wrath (Xbox 360).
+  A .iso do jogo (Xbox 360).
 .PARAMETER RefazerDe
   Refaz a partir desta etapa (por exemplo 3 depois de uma versão nova do port).
 .PARAMETER Jobs
   Quantos núcleos usar na compilação (padrão: todos).
 
 .EXAMPLE
-  .\gerar.ps1 -Iso "D:\Jogos\Asura's Wrath (World).iso"
+  .\gerar.ps1 -Iso "D:\Jogos\jogo.iso"
 #>
 param(
     [string]$Iso = '',
@@ -34,8 +34,12 @@ if (-not $Jobs) { $Jobs = [Environment]::ProcessorCount }
 $OUT = Join-Path $R 'out\gerar'
 New-Item -ItemType Directory -Force $OUT | Out-Null
 
-# the game this port was made from: Asura's Wrath (World), title 43430817
-$SHA1_XEX = 'bcaec56eabad135071ee879b4bbcc6aa1e3362b8'
+# the project (from its manifest) and the game it was made from (config\jogo.txt: titulo, versao, sha1_xex)
+$NOME = (Get-ChildItem $R -Filter '*_manifest.toml' | Select-Object -First 1).Name -replace '_manifest\.toml$', ''
+$JOGO = @{}
+foreach ($linha in Get-Content (Join-Path $R 'config\jogo.txt') -Encoding UTF8) {
+    if ($linha -match '^\s*([a-z0-9_]+)\s*=\s*(.*?)\s*$') { $JOGO[$Matches[1]] = $Matches[2] }
+}
 # the tools, pinned
 $SDK_VERSAO = '0.10.0.24'
 $SDK_URL = 'https://github.com/rexglue/rexglue-sdk/releases/download/nightly-20261002-bd833a2a/rexglue-sdk-0.10.0.24-dev.gbd833a2-win-amd64.zip'
@@ -180,15 +184,15 @@ Etapa 2 '2_jogo' {
     $xex = Join-Path $assets 'default.xex'
     Ler-Xex $Iso $xex
     $sha = (Get-FileHash $xex -Algorithm SHA1).Hash.ToLower()
-    if ($sha -ne $SHA1_XEX) {
-        throw "esta .iso não é a versão do port (Asura's Wrath World, default.xex SHA-1 $SHA1_XEX; a sua: $sha)"
+    if ($sha -ne $JOGO['sha1_xex']) {
+        throw "esta .iso não é a versão do port ($($JOGO['versao']), default.xex SHA-1 $($JOGO['sha1_xex']); a sua: $sha)"
     }
     Set-Content -Path (Join-Path $OUT 'iso.txt') -Value $Iso -Encoding UTF8
 }
 
 # ---------------------------------------------------------------------------- 3. tradução
 Etapa 3 '3_traducao' {
-    Exec "cd /d `"$R`" && `"$SDK\bin\rexglue.exe`" codegen asuraswrath_manifest.toml"
+    Exec "cd /d `"$R`" && `"$SDK\bin\rexglue.exe`" codegen ${NOME}_manifest.toml"
 }
 
 # ---------------------------------------------------------------------------- 4. compilação
@@ -196,9 +200,9 @@ Etapa 4 '4_compilar' {
     $vs = Achar-VS
     $build = Join-Path $R 'out\build\win-amd64-release'
     Remove-Item -Recurse -Force $build -ErrorAction SilentlyContinue
-    $cfg = "cmake --preset win-amd64-release -DCMAKE_C_COMPILER=`"$LLVM\bin\clang.exe`" -DCMAKE_CXX_COMPILER=`"$LLVM\bin\clang++.exe`" -DCMAKE_PREFIX_PATH=`"$SDK`""
+    $cfg = "cmake --preset win-amd64-release -DCMAKE_C_COMPILER=`"$LLVM\bin\clang.exe`" -DCMAKE_CXX_COMPILER=`"$LLVM\bin\clang++.exe`" -DCMAKE_PREFIX_PATH=`"$SDK`" -DPORT_CPU_NATIVO=ON"
     Exec "call `"$vs\Common7\Tools\VsDevCmd.bat`" -arch=amd64 -host_arch=amd64 >nul && set `"PATH=$LLVM\bin;%PATH%`" && cd /d `"$R`" && $cfg && cmake --build out\build\win-amd64-release --parallel $Jobs"
-    if (-not (Test-Path (Join-Path $build 'asuraswrath.exe'))) { throw 'a compilação não gerou o asuraswrath.exe' }
+    if (-not (Test-Path (Join-Path $build "$NOME.exe"))) { throw "a compilação não gerou o $NOME.exe" }
 }
 
 # ---------------------------------------------------------------------------- 5. pronto
@@ -207,8 +211,9 @@ Etapa 5 '5_jogar' {
     $jogar = Join-Path $R 'jogar.cmd'
     $linhas = @(
         '@echo off',
-        'rem Asura''s Wrath: o port, lendo a .iso direto. Opções: asuraswrath.toml ao lado do exe, ou --nome valor.',
-        "start `"`" `"%~dp0out\build\win-amd64-release\asuraswrath.exe`" --game_data_root `"%~dp0assets`" --iso `"$iso`" %*"
+        "rem $($JOGO['titulo']): o port, lendo a .iso direto. Opções: $NOME.toml ao lado do exe, ou --nome valor.",
+        'chcp 65001 >nul',
+        "start `"`" `"%~dp0out\build\win-amd64-release\$NOME.exe`" --game_data_root `"%~dp0assets`" --iso `"$iso`" %*"
     )
     [IO.File]::WriteAllLines($jogar, $linhas, (New-Object Text.UTF8Encoding($false)))
     Msg "pronto: $jogar"
