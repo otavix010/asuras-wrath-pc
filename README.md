@@ -24,7 +24,7 @@ DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos 
 ## Estado dos testes
 
 - Episódios 1, 2 e 3 completos, com as QTEs, os contra-ataques e o tiro feitos pelo controle roteirizado e pelo leitor de avisos da tela (`scripts/qte.py`).
-- 60 fps em 2x (1440p) nas lutas e nas cenas, com o jogo sozinho na máquina (RTX 5080); o Episódio 2 também passou a 120 fps (média 119).
+- Em 2x (1440p), com os render targets por ROV (o padrão dele em placas NVIDIA): 60 fps cravados nas lutas com a GPU em 45% (RTX 5080), 120 fps nas lutas (média 118,6) e 3x (4K) a 60 (média 59,5). Pelo caminho RTV, o mesmo trecho pedia 76% a 99% da GPU e caía para 48-54 fps; a imagem é a mesma nos dois.
 - Som, saves e a troca de episódios funcionam.
 
 ## Gerar à mão (sem o launcher)
@@ -54,6 +54,7 @@ Ficam em `asuraswrath.toml` ao lado do executável, ou no arquivo indicado pela 
 | `monitor` | 0 (padrão), 1, 2... | 0 |
 | `mostrar_fps` | `true`, `false` | `false` |
 | `volume` | 0 a 100 | 100 |
+| `alvos` | `auto`, `rov`, `rtv`: como a EDRAM é imitada; `auto` usa o caminho medido melhor para o jogo | `auto` |
 | `vibration` | `true`, `false` | `true` |
 | `zona_morta_esquerda`, `zona_morta_direita` | 0 a 50 (%) | 0 |
 | `user_language` | 1 inglês, 3 alemão, 4 francês, 5 espanhol, 6 italiano, 2 japonês | 1 |
