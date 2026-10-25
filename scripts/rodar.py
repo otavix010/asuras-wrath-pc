@@ -19,11 +19,12 @@ CAPTURE = r'C:\Users\otavi\fifast2-port\scripts\captura.ps1'
 
 
 def cycle(start, end):
-    """every button, the triggers and both sticks' four directions, round and round (8 s), for QTEs met unseen"""
-    period, out = 8.0, []
+    """every button, the triggers, both sticks' four directions and the left stick turning round both ways, round and
+    round (12 s), for QTEs met unseen"""
+    period, out = 12.0, []
     steps = [(0, 'A', 0.15), (0.5, 'B', 0.15), (1, 'X', 0.15), (1.5, 'Y', 0.15), (2, 'RT', 0.4),
              (2.5, 'LY-+RY-', 0.8), (3.5, 'LY++RY+', 0.8), (4.5, 'LX-+RX-', 0.8), (5.5, 'LX++RX+', 0.8),
-             (6.5, 'LT+RT', 0.4)]
+             (6.5, 'LT+RT', 0.4), (8, 'LROT', 1.8), (10, 'LROT-', 1.8)]
     steps += [(7 + i * 0.2, 'B', 0.1) for i in range(5)]  # a burst, for the mashing ones
     for at, button, hold in steps:
         out.append(f'{start + at:g}-{end:g}@{period:g}/{hold:g}:{button}')
@@ -50,8 +51,10 @@ def main():
     live.write_text('', encoding='ascii')
     log = BUILD / 'run.log'
     log.unlink(missing_ok=True)
+    fps_log = BUILD / 'fps.log'
+    fps_log.unlink(missing_ok=True)
     env = dict(os.environ, REX_LOG_FILE=str(log), REX_GAME_DATA_ROOT=str(ROOT / 'assets'), REX_FULLSCREEN='false',
-               REX_HEADLESS='true', AW_PAD=','.join(pad), AW_PAD_LIVE=str(live))
+               REX_HEADLESS='true', AW_PAD=','.join(pad), AW_PAD_LIVE=str(live), AW_FPS_LOG=str(fps_log))
     for v in a.var:
         k, _, val = v.partition('=')
         env[k] = val
@@ -66,6 +69,9 @@ def main():
         if moved and state != last_state:
             print(f'janela aos {time.time() - t0:.1f} s: {state}', flush=True)
             last_state = state
+            # back to the left monitor whenever it leaves it (it is never to sit on the main one)
+            if any(x > -500 for x, y, w, h, zoomed in state):
+                move_left(p.pid)
         while marks and time.time() - t0 >= marks[0]:
             s = int(marks.pop(0))
             subprocess.run(['powershell', '-NoProfile', '-File', CAPTURE, '-Id', str(p.pid),
@@ -77,6 +83,20 @@ def main():
         print(f'fechado aos {a.segundos:.0f} s')
     else:
         print(f'saiu com {p.returncode} aos {time.time() - t0:.0f} s')
+    summarize_fps(fps_log, a.cada or 30)
+
+
+def summarize_fps(path, window):
+    """the frame rate per window of seconds: lowest and mean of the per-second counts"""
+    if not path.exists():
+        return
+    rows = [line.split() for line in path.read_text().splitlines() if line.strip()]
+    per_window = {}
+    for t, n in rows:
+        per_window.setdefault(int(float(t) // window), []).append(int(n))
+    print('fps por trecho (mínimo / média):')
+    for w, counts in sorted(per_window.items()):
+        print(f'  {w * window:>5.0f}-{(w + 1) * window:<5.0f} s  {min(counts):>3} / {sum(counts) / len(counts):5.1f}')
 
 
 if __name__ == '__main__':

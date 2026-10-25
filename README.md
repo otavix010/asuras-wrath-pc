@@ -1,0 +1,73 @@
+# Asura's Wrath — port nativo para PC
+
+Port do **Asura's Wrath** (Xbox 360) por **recompilação estática**: o código PowerPC do jogo é traduzido para C++ e compilado como um programa de Windows. Não há emulador de CPU rodando o jogo. A parte gráfica usa o runtime da [ReXGlue](https://github.com/rexglue/rexglue-sdk), derivado do [Xenia](https://xenia.jp).
+
+**Nada do jogo vem neste repositório.** O port é gerado no seu PC a partir da sua própria cópia (a imagem `.iso` do disco). O código traduzido também é gerado aí e nunca é distribuído.
+
+O jeito mais fácil de jogar é pelo [Otavix Launcher](https://github.com/otavix010/otavix-launcher), que baixa este port, pede a sua `.iso`, gera tudo e cuida das opções.
+
+## O que o port acrescenta
+
+| | Xbox 360 | Port |
+|--|--|--|
+| Taxa de quadros | 30 fps | 30, **60**, 120 ou 144 fps (quadros reais) |
+| Resolução interna | 720p | 720p, **1440p** ou 4K |
+| Ampliação para a tela | — | AMD FSR 1, AMD CAS ou bilinear, com nitidez ajustável |
+| Anti-aliasing | o do jogo | o do jogo, mais FXAA opcional |
+| Filtro anisotrópico | o do jogo | até 16x |
+| Contador de fps | — | opcional, no canto da tela |
+
+DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos de Xbox 360 não fornecem. O ganho de nitidez vem da resolução interna (supersampling de verdade), e a fluidez vem dos fps reais.
+
+## Gerar à mão (sem o launcher)
+
+Precisa do **Visual Studio 2022 Build Tools** com "Desenvolvimento para desktop com C++" e "C++ CMake tools for Windows". O gerador baixa o resto: o SDK da ReXGlue e o Clang (LLVM) portátil, numa pasta `_ferramentas` ao lado do port.
+
+```powershell
+.\gerar.ps1 -Iso "D:\Jogos\Asura's Wrath (World).iso"
+.\jogar.cmd
+```
+
+O port foi feito a partir do **Asura's Wrath (World)**. O gerador confere o `default.xex` da sua `.iso` (SHA-1 `bcaec56eabad135071ee879b4bbcc6aa1e3362b8`) e avisa se for outra versão.
+
+## Opções
+
+Ficam em `asuraswrath.toml` ao lado do executável, ou no arquivo indicado pela variável `PORT_OPCOES`. O launcher grava em `opcoes.toml`. Cada uma também vale na linha de comando (`--fps 120`) ou como variável de ambiente (`REX_FPS=120`).
+
+| Opção | Valores | Padrão |
+|--|--|--|
+| `fps` | 30, 60, 120, 144 | 60 |
+| `resolution_scale` | 1 (720p), 2 (1440p), 3 (4K) | 2 |
+| `filtro` | `fsr`, `cas`, `bilinear` | `fsr` |
+| `nitidez` | 0 a 100 | 70 |
+| `swap_post_effect` | `none`, `fxaa`, `fxaa_extreme` | `none` |
+| `anisotropic_override` | -1 (o do jogo), 3 (4x), 4 (8x), 5 (16x) | 5 |
+| `fullscreen` | `true`, `false` | `true` |
+| `monitor` | 0 (padrão), 1, 2... | 0 |
+| `mostrar_fps` | `true`, `false` | `false` |
+| `user_language` | 1 inglês, 3 alemão, 4 francês, 5 espanhol, 6 italiano, 2 japonês | 1 |
+| `iso` | caminho da `.iso` | — |
+
+## Como funciona
+
+- `config/asuraswrath.toml`: as funções que a análise estática não acha sozinha (chamadas só por ponteiro) e os ganchos no código do jogo.
+- `src/frame_rate.h`: os dois pontos que prendem o jogo em 30 fps viram uma opção. O intervalo de apresentação de 2 vblanks passa a 1, e o teto de tick do motor fica sem limite. Acima de 60, o vblank do console emulado também acelera.
+- `src/input_lock.h`: corrige uma corrida da ReXGlue. A lista de controles é refeita a cada leitura sem trava, e a leitura do controle num thread junto com a vibração em outro corrompia o heap.
+- `src/port_options.h`: as opções de imagem e os padrões do port.
+- `src/fps_overlay.h`: o contador, que conta cada quadro entregue à GPU.
+- `src/crash_log.h`: em caso de falha, grava `falha.log` com a pilha. `scripts/pilha.py` dá nome aos quadros.
+- O app também lê a `.iso` direto (`iso`). As caixas de mensagem do sistema, que só aceitam teclado e mouse, são respondidas com o botão padrão (`headless`).
+
+Para desenvolver: `build.cmd` compila; `scripts/rodar.py` roda numa janela com prints e um controle roteirizado (`AW_PAD`); `scripts/tecla.py` aperta botões no jogo em execução.
+
+## Créditos
+
+- [ReXGlue SDK](https://github.com/rexglue/rexglue-sdk): recompilador estático e runtime de Xbox 360 (BSD-3).
+- [Xenia](https://github.com/xenia-project/xenia): o emulador em que o runtime se baseia (BSD-3).
+- boma, em [xenia-canary/game-patches](https://github.com/xenia-canary/game-patches): achou onde o jogo trava os 30 fps.
+
+Asura's Wrath é marca da Capcom. Este projeto não tem relação com a Capcom nem com a Microsoft.
+
+## Licença
+
+O código deste repositório está sob a licença MIT (`LICENSE`). O SDK e o runtime têm a licença própria deles (BSD-3).

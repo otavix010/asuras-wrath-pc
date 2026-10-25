@@ -23,6 +23,7 @@
 #include "frame_rate.h"
 #include "input_lock.h"
 #include "pad_script.h"
+#include "port_options.h"
 
 REXCVAR_DEFINE_STRING(iso, "", "Port",
                       "The game's disc image (.iso), read in place; game_data_root then needs only default.xex");
@@ -38,9 +39,12 @@ class AsurasWrathApp : public rex::ReXApp {
         PPCImageConfig));
   }
 
-  // the game in assets beside the executable unless game_data_root says otherwise; saves and caches in usuario
+  // the game in assets beside the executable unless game_data_root says otherwise; saves and caches in usuario; the
+  // options in PORT_OPCOES when given (the launcher keeps them at the port's root, which a new build leaves alone)
   void OnConfigurePaths(rex::PathConfig& paths) override {
     auto exe_dir = rex::filesystem::GetExecutableFolder();
+    if (const char* options = std::getenv("PORT_OPCOES"))
+      paths.config_path = std::filesystem::path(reinterpret_cast<const char8_t*>(options));
     if (paths.game_data_root.empty()) paths.game_data_root = exe_dir / "assets";
     if (paths.user_data_root == rex::filesystem::GetUserFolder() / GetName()) {
       paths.user_data_root = exe_dir / "usuario";
@@ -53,6 +57,8 @@ class AsurasWrathApp : public rex::ReXApp {
   void OnPreSetup(rex::RuntimeConfig& config) override {
     if (config.gpu_plugin.empty() && !config.graphics) config.gpu_plugin = "xenos";
     if (rex::cvar::GetFlagSource("headless") == rex::cvar::Source::kDefault) rex::cvar::SetFlagByName("headless", "true");
+    ApplyFrameRate();
+    port_options::Apply();
     // development: AW_PAD puts the scripted controller (pad_script.h) in the controllers' place
     if (const char* script = std::getenv("AW_PAD")) {
       config.input_factory = [script = std::string(script)](bool tool_mode)

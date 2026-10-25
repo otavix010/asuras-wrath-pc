@@ -1,11 +1,14 @@
 // mostrar_fps: the game's frame rate in the top-left corner, counted at each frame the game hands to the GPU (right
 // after its VdSwap, the midasm hook AwFrame in config/asuraswrath.toml) and shown twice a second.
+// Development: AW_FPS_LOG=file gets "<seconds since the start> <frames in that second>" once a second.
 
 #pragma once
 
 #include <atomic>
 #include <chrono>
 #include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 
 #include <imgui.h>
 #include <rex/cvar.h>
@@ -15,7 +18,26 @@ REXCVAR_DEFINE_BOOL(mostrar_fps, false, "Port", "Show the frame rate in the top-
 
 inline std::atomic<uint64_t> g_guest_frames{0};
 
-void AwFrame() { g_guest_frames.fetch_add(1, std::memory_order_relaxed); }
+void AwFrame() {
+  uint64_t frames = g_guest_frames.fetch_add(1, std::memory_order_relaxed) + 1;
+  // the frames come from one guest thread, so the log's state needs no lock
+  static FILE* log = [] {
+    const char* path = std::getenv("AW_FPS_LOG");
+    return path ? std::fopen(path, "w") : nullptr;
+  }();
+  if (!log) return;
+  using Clock = std::chrono::steady_clock;
+  static const Clock::time_point start = Clock::now();
+  static double next = 1;
+  static uint64_t last = 0;
+  double t = std::chrono::duration<double>(Clock::now() - start).count();
+  if (t >= next) {
+    std::fprintf(log, "%.0f %llu\n", t, static_cast<unsigned long long>(frames - last));
+    std::fflush(log);
+    last = frames;
+    next = t + 1;
+  }
+}
 
 class FpsOverlay final : public rex::ui::ImGuiDialog {
  public:

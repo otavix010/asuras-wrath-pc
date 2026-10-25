@@ -2,7 +2,8 @@
 //   AW_PAD="12:START,14.5:A,20-22:LX-,40-300@3:A"
 //   at a second: a 0.15 s press; over a range: held; over a range @n: pressed every n seconds (@n/h: held h seconds).
 // Buttons: A B X Y LB RB LT RT START BACK UP DOWN LEFT RIGHT LS RS; sticks at full tilt: LX+ LX- LY+ LY- RX+ RX- RY+ RY-
-// (Y+ is up); several at once joined by +, as LY-+RY- (both sticks down). Seconds count from the app's start.
+// (Y+ is up); LROT RROT turn a stick round clockwise, twice a second, LROT- RROT- the other way; several at once
+// joined by +, as LY-+RY- (both sticks down). Seconds count from the app's start.
 // AW_PAD_LIVE=file takes commands while the game runs: each line appended, "<seconds> <buttons>", holds them from then
 // (scripts/tecla.py writes them).
 
@@ -46,7 +47,7 @@ class ScriptedPad final : public rex::input::InputDriver {
     for (const Press& p : presses_) {
       bool on = t >= p.from && t < p.to;
       if (on && p.every > 0) on = std::fmod(t - p.from, p.every) < p.hold;
-      if (on) Apply(p.button, pad);
+      if (on) Apply(p.button, pad, t);
     }
     if (std::memcmp(&pad, &last_, sizeof pad) != 0) {
       packet_++;  // a new packet number for every change, as a real pad
@@ -155,7 +156,7 @@ class ScriptedPad final : public rex::input::InputDriver {
     }
   }
 
-  static void Apply(const std::string& all, Pad& pad) {
+  static void Apply(const std::string& all, Pad& pad, double t) {
     for (size_t pos = 0; pos < all.size();) {
       // + joins buttons, and is also the sign of a stick: LX++LY- is LX+ and LY-
       size_t plus = all.find('+', pos);
@@ -164,11 +165,20 @@ class ScriptedPad final : public rex::input::InputDriver {
         plus = all.find('+', plus + 1);
       std::string b = all.substr(pos, plus == std::string::npos ? std::string::npos : plus - pos);
       pos = plus == std::string::npos ? all.size() : plus + 1;
-      ApplyOne(b, pad);
+      ApplyOne(b, pad, t);
     }
   }
 
-  static void ApplyOne(const std::string& b, Pad& pad) {
+  static void ApplyOne(const std::string& b, Pad& pad, double t) {
+    // a stick going round twice a second, starting up: clockwise is up, right, down, left
+    if (b == "LROT" || b == "LROT-" || b == "RROT" || b == "RROT-") {
+      double a = t * 2 * 3.14159265358979 * 2;
+      int16_t x = static_cast<int16_t>(std::sin(a) * 32767 * (b.back() == '-' ? -1 : 1));
+      int16_t y = static_cast<int16_t>(std::cos(a) * 32767);
+      (b[0] == 'L' ? pad.lx : pad.rx) = x;
+      (b[0] == 'L' ? pad.ly : pad.ry) = y;
+      return;
+    }
     static const struct {
       const char* name;
       uint16_t bit;
