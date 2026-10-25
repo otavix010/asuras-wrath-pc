@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
   Gera e compila o port a partir da SUA cópia do jogo (a .iso do Xbox 360).
 
@@ -35,7 +35,7 @@ $OUT = Join-Path $R 'out\gerar'
 New-Item -ItemType Directory -Force $OUT | Out-Null
 
 # the project (from its manifest) and the game it was made from (config\jogo.txt: titulo, versao, sha1_xex)
-$NOME = (Get-ChildItem $R -Filter '*_manifest.toml' | Select-Object -First 1).Name -replace '_manifest\.toml$', ''
+$PROJETO = (Get-ChildItem $R -Filter '*_manifest.toml' | Select-Object -First 1).Name -replace '_manifest\.toml$', ''
 $JOGO = @{}
 foreach ($linha in Get-Content (Join-Path $R 'config\jogo.txt') -Encoding UTF8) {
     if ($linha -match '^\s*([a-z0-9_]+)\s*=\s*(.*?)\s*$') { $JOGO[$Matches[1]] = $Matches[2] }
@@ -211,7 +211,7 @@ Etapa 2 '2_jogo' {
 
 # ---------------------------------------------------------------------------- 3. tradução
 Etapa 3 '3_traducao' {
-    Exec "cd /d `"$R`" && `"$SDK\bin\rexglue.exe`" codegen ${NOME}_manifest.toml"
+    Exec "cd /d `"$R`" && `"$SDK\bin\rexglue.exe`" codegen ${PROJETO}_manifest.toml"
 }
 
 # ---------------------------------------------------------------------------- 4. compilação
@@ -221,7 +221,7 @@ Etapa 4 '4_compilar' {
     Remove-Item -Recurse -Force $build -ErrorAction SilentlyContinue
     $cfg = "cmake --preset win-amd64-release -DCMAKE_C_COMPILER=`"$LLVM\bin\clang.exe`" -DCMAKE_CXX_COMPILER=`"$LLVM\bin\clang++.exe`" -DCMAKE_PREFIX_PATH=`"$SDK`" -DPORT_CPU_NATIVO=ON"
     Exec "call `"$vs\Common7\Tools\VsDevCmd.bat`" -arch=amd64 -host_arch=amd64 >nul && set `"PATH=$LLVM\bin;%PATH%`" && cd /d `"$R`" && $cfg && cmake --build out\build\win-amd64-release --parallel $Jobs"
-    if (-not (Test-Path (Join-Path $build "$NOME.exe"))) { throw "a compilação não gerou o $NOME.exe" }
+    if (-not (Test-Path (Join-Path $build "$PROJETO.exe"))) { throw "a compilação não gerou o $PROJETO.exe" }
 }
 
 # ---------------------------------------------------------------------------- 5. pronto
@@ -230,9 +230,9 @@ Etapa 5 '5_jogar' {
     $jogar = Join-Path $R 'jogar.cmd'
     $linhas = @(
         '@echo off',
-        "rem $($JOGO['titulo']): o port, lendo a .iso direto. Opções: $NOME.toml ao lado do exe, ou --nome valor.",
+        "rem $($JOGO['titulo']): o port, lendo a .iso direto. Opções: $PROJETO.toml ao lado do exe, ou --nome valor.",
         'chcp 65001 >nul',
-        "start `"`" `"%~dp0out\build\win-amd64-release\$NOME.exe`" --game_data_root `"%~dp0assets`" --iso `"$iso`" %*"
+        "start `"`" `"%~dp0out\build\win-amd64-release\$PROJETO.exe`" --game_data_root `"%~dp0assets`" --iso `"$iso`" %*"
     )
     [IO.File]::WriteAllLines($jogar, $linhas, (New-Object Text.UTF8Encoding($false)))
     Msg "pronto: $jogar"
