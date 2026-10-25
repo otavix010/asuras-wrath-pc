@@ -17,7 +17,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from explorar import letterbox  # noqa: E402
-from port import BUILD, EXE, ROOT  # noqa: E402
+from port import BUILD, EXE, ROOT, kill_from  # noqa: E402
 from qte import camera  # noqa: E402
 from tecla import press  # noqa: E402
 
@@ -46,7 +46,7 @@ def lines(path):
 
 def start(label, env, fps_overlay=True, seconds=1500, episode=4):
     """the game started with env and Episode 4 begun (the moment Yes is pressed): its rodar.py process, or None"""
-    subprocess.run(['taskkill', '/F', '/IM', EXE.name], capture_output=True)
+    kill_from(ROOT, EXE.name)
     wait(3)
     args = [sys.executable, '-I', str(ROOT / 'scripts' / 'rodar.py'), '--segundos', str(seconds), '--prints',
             str(seconds - 1),
@@ -87,7 +87,7 @@ def shots(label, env, times):
         cam.grab().save(out / f'{label}_{t:05.1f}.png')
     cam.close()
     game.kill()
-    subprocess.run(['taskkill', '/F', '/IM', EXE.name], capture_output=True)
+    kill_from(ROOT, EXE.name)
     print(f'[{label}] {len(times)} prints em {out}', flush=True)
 
 
@@ -121,7 +121,7 @@ def run(label, env, fight_seconds):
         except OSError:
             pass
     game.kill()
-    subprocess.run(['taskkill', '/F', '/IM', EXE.name], capture_output=True)
+    kill_from(ROOT, EXE.name)
     if not fps:
         print(f'[{label}] sem medição')
         return
