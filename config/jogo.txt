@@ -10,3 +10,4 @@ fps_original=30
 fps_padrao=60
 idiomas=1,5,4,3,6,2
 credito=boma (xenia-canary/game-patches)|achou onde o jogo trava os 30 fps|found where the game holds 30 fps|encontró dónde el juego fija los 30 fps
+alvos_nota=No Asura's Wrath, o ROV é bem mais leve (60 fps em 4K numa RTX 5080, contra 28 no RTV), mas acima de 1x deixa pontos verdes nas áreas muito escuras; o Automático usa o RTV, de imagem certa.|In Asura's Wrath, ROV is much lighter (60 fps at 4K on an RTX 5080, against 28 with RTV), but above 1x it leaves green specks in very dark areas; Automatic uses RTV, which is correct.|En Asura's Wrath, ROV es mucho más ligero (60 fps en 4K en una RTX 5080, frente a 28 con RTV), pero por encima de 1x deja puntos verdes en las zonas muy oscuras; Automático usa RTV, de imagen correcta.
