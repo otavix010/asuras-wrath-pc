@@ -1,0 +1,9 @@
+# nothing of the game goes in the repository: its files, and the code generated from its executable
+assets/
+generated/default/
+imagem.bin
+# build outputs and logs
+out/
+*.log
+codegen.out
+tela_*.png
