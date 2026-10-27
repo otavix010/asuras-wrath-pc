@@ -30,7 +30,7 @@ def main():
     threads = []
     for tid in P.thread_ids(pid):
         h = P.k32.OpenThread(P.THREAD_ALL_ACCESS, False, tid)
-        if P.description(h).startswith(a.thread):
+        if a.thread in P.description(h):
             threads.append(h)
         else:
             P.k32.CloseHandle(h)

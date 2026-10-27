@@ -96,6 +96,7 @@ def run(label, env, fight_seconds):
     game = start(label, env)
     if not game:
         return
+    opening_first = len(lines(BUILD / 'quadros.log'))
     wait(5)
     # the opening: wait for 8 s running without a cutscene's bars, then walk
     cam = camera()
@@ -104,6 +105,13 @@ def run(label, env, fight_seconds):
         clear = clear + 0.5 if not letterbox(np.asarray(cam.grab())) else 0.0
         wait(0.5)
     cam.close()
+    # the opening's first 40 s, the same pictures every run: the scene to compare configurations by
+    opening = np.array([float(x) for x in lines(BUILD / 'quadros.log')[opening_first:] if x.strip()])
+    opening = opening[np.cumsum(opening) <= 40000]
+    if opening.size:
+        print(f'[{label}] abertura {opening.size} quadros em {opening.sum() / 1000:.1f} s: '
+              f'{1000 * opening.size / opening.sum():.1f} fps, p99 {np.percentile(opening, 99):.1f} ms, '
+              f'acima de 20 ms {(opening > 20).mean() * 100:.1f}%', flush=True)
     walk = subprocess.run([sys.executable, '-I', str(ROOT / 'scripts' / 'explorar.py'), '--segundos', '600',
                            '--passo', '6'], cwd=ROOT, capture_output=True, text=True)
     print(f'[{label}] {walk.stdout.strip()}', flush=True)
