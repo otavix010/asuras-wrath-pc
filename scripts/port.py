@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parent.parent
 NAME = next(ROOT.glob('*_manifest.toml')).name[:-len('_manifest.toml')]
 BUILD = ROOT / 'out' / 'build' / 'win-amd64-release'
 EXE = BUILD / f'{NAME}.exe'
+CAPTURE = BUILD / 'tela.bmp'  # the game's picture (PORT_CAPTURA), the scripts' eyes
 GENERATED = ROOT / 'generated' / 'default'
 FUNCS = ROOT / 'config' / 'funcoes.toml'
 REXGLUE = ROOT.parent / 'rexglue-sdk' / 'win-amd64' / 'bin' / 'rexglue.exe'
@@ -33,7 +34,8 @@ def test_env(log, **extra):
     """a run's environment: the log, the game folder, a window (never fullscreen nor activated), the prompts answered"""
     # the window never activated (shown or raised): the person at the PC keeps the focus
     env = dict(os.environ, REX_LOG_FILE=str(log), REX_GAME_DATA_ROOT=str(ROOT / 'assets'), REX_FULLSCREEN='false',
-               REX_HEADLESS='true', SDL_WINDOW_ACTIVATE_WHEN_SHOWN='0', SDL_WINDOW_ACTIVATE_WHEN_RAISED='0')
+               REX_HEADLESS='true', SDL_WINDOW_ACTIVATE_WHEN_SHOWN='0', SDL_WINDOW_ACTIVATE_WHEN_RAISED='0',
+               PORT_CAPTURA=str(CAPTURE), PORT_CAPTURA_MS='33')
     if ISO_FILE.exists():
         env['REX_ISO'] = ISO_FILE.read_text(encoding='utf-8').strip()
     env.update({k: str(v) for k, v in extra.items()})
@@ -57,11 +59,11 @@ def _windows(pid):
 
 
 def move_left(pid, y=300):
-    """the whole window on the left monitor (1080x1920 at x=-1080): 1080 wide, 16:9, away from the main one; two fit
-    one above the other (y=300 and y=1000)"""
+    """the whole window off every screen (x=-2400; there is one monitor now), 1080x640, never activated: the scripts
+    see the game through PORT_CAPTURA (CAPTURE), not the window"""
     found = _windows(pid)
     for hwnd in found:
-        ctypes.windll.user32.SetWindowPos(hwnd, None, -1080, y, 1080, 640, 0x14)  # NOZORDER | NOACTIVATE
+        ctypes.windll.user32.SetWindowPos(hwnd, None, -2400, y, 1080, 640, 0x14)  # NOZORDER | NOACTIVATE
     return bool(found)
 
 

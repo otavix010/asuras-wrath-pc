@@ -21,7 +21,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from port import EXE, ROOT, _windows  # noqa: E402
+from port import CAPTURE, EXE, ROOT, _windows  # noqa: E402
 from pilhas import find_pid  # noqa: E402
 
 user32 = ctypes.windll.user32
@@ -63,10 +63,35 @@ class Camera:
         user32.ReleaseDC(None, self.screen)
 
 
+class CaptureCamera:
+    """the game's picture from PORT_CAPTURA (the window sits off every screen, where it is never drawn), laid out as
+    PrintWindow saw the old 1080x640 window: the client area 8 px in and 31 px down, 1064x598, so the coordinates
+    measured on those grabs still hold"""
+    SIZE, CLIENT, AT = (1080, 640), (1064, 598), (8, 32)
+
+    def __init__(self):
+        self.last = Image.new('RGB', self.SIZE)
+
+    def grab(self):
+        try:
+            with Image.open(CAPTURE) as im:
+                frame = Image.new('RGB', self.SIZE)
+                frame.paste(im.convert('RGB').resize(self.CLIENT, Image.BILINEAR), self.AT)
+                self.last = frame
+        except (OSError, SyntaxError, ValueError):
+            pass  # the file being replaced: the last picture again
+        return self.last
+
+    def close(self):
+        pass
+
+
 def camera():
     pid = find_pid(EXE.name)
     if not pid:
         sys.exit('o jogo não está rodando')
+    if CAPTURE.exists():
+        return CaptureCamera()
     found = _windows(pid)
     if not found:
         sys.exit('janela do jogo não encontrada')

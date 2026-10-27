@@ -92,6 +92,7 @@ def shots(label, env, times):
 
 
 def run(label, env, fight_seconds):
+    env = env + [f"PORT_QUADROS_LOG={BUILD / 'quadros.log'}"]
     game = start(label, env)
     if not game:
         return
@@ -108,10 +109,12 @@ def run(label, env, fight_seconds):
     print(f'[{label}] {walk.stdout.strip()}', flush=True)
     fps_first = len(lines(BUILD / 'fps.log'))
     gpu_start = len(lines(BUILD / 'gpu.log'))
+    frames_first = len(lines(BUILD / 'quadros.log'))
     subprocess.run([sys.executable, '-I', str(ROOT / 'scripts' / 'qte.py'), '--jogar', str(fight_seconds), '--ciclo'],
                    cwd=ROOT, capture_output=True)
     fps = [int(x.split()[1]) for x in lines(BUILD / 'fps.log')[fps_first:] if len(x.split()) == 2]
     gpu = [int(x) for x in lines(BUILD / 'gpu.log')[gpu_start:] if x.strip().isdigit()]
+    frame_ms = np.array([float(x) for x in lines(BUILD / 'quadros.log')[frames_first:] if x.strip()])
     out = ROOT / 'comparar'
     out.mkdir(exist_ok=True)
     (out / f'{label}_luta.txt').write_text('\n'.join(f'{f} {g}' for f, g in zip(fps, gpu + [0] * len(fps))))
@@ -128,6 +131,12 @@ def run(label, env, fight_seconds):
     fps_a = np.array(fps)
     print(f'[{label}] luta {len(fps)} s: fps médio {fps_a.mean():.1f}, 1% pior {np.percentile(fps_a, 1):.0f}, '
           f'segundos abaixo de 55: {(fps_a < 55).sum()}, GPU média {np.mean(gpu) if gpu else 0:.0f}%', flush=True)
+    if frame_ms.size:
+        # the frames' times: a frame that missed a 60 Hz blank shows as one of ~33 ms
+        print(f'[{label}] quadros {frame_ms.size}: {np.mean(frame_ms):.2f} ms em média, desvio {np.std(frame_ms):.2f}, '
+              f'p99 {np.percentile(frame_ms, 99):.1f}, acima de 20 ms {(frame_ms > 20).mean() * 100:.1f}%, '
+              f'acima de 30 ms {(frame_ms > 30).mean() * 100:.1f}%, '
+              f'variação entre seguidos {np.mean(np.abs(np.diff(frame_ms))):.2f} ms', flush=True)
 
 
 def main():
