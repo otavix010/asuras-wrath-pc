@@ -1,8 +1,11 @@
 // The game's frame rate, counted at each frame the game hands to the GPU (right after its VdSwap, the midasm hook
 // PortFrame in config/ganchos.toml), and what is done with it:
-//   mostrar_fps      the frame rate and the frame's time in the top-left corner (the game's own option)
-//   OTAVIX_OSD=1     the launcher's performance meter: also the processor's and the graphics card's use and
-//                    temperature and the video memory (osd_stats.cpp); F10 shows or hides either during the game
+//   F10              shows or hides the launcher's performance meter during the game, whatever the options (as in
+//                    the other Otavix ports): the frame rate and the frame's time, the processor's and the graphics
+//                    card's use and temperature, the video and the system memory (osd_stats.cpp)
+//   mostrar_fps      the game starts with the frame rate and the frame's time in the top-left corner (the game's own
+//                    option)
+//   OTAVIX_OSD=1     the game starts with the whole meter (the launcher's option)
 //   OTAVIX_DESEMPENHO=file   the session's frame rate for the launcher, written every 30 s and as the game closes:
 //                    {"versao":1,"build":...,"fps":{"medio","p1","min","max","amostras"},"minutos":...}; a sample is a
 //                    second, the first 30 s (the logos and the first load) and seconds above the frame rate asked
@@ -133,14 +136,17 @@ void PortFrame() {
 class FpsOverlay final : public rex::ui::ImGuiDialog {
  public:
   explicit FpsOverlay(rex::ui::ImGuiDrawer* drawer)
-      : ImGuiDialog(drawer), last_time_(Clock::now()), full_(port_perf::OsdWanted()) {
+      : ImGuiDialog(drawer),
+        last_time_(Clock::now()),
+        full_(port_perf::OsdWanted() || !REXCVAR_GET(mostrar_fps)),
+        shown_(port_perf::OsdWanted() || REXCVAR_GET(mostrar_fps)) {
     otx_osd_iniciar();
   }
   ~FpsOverlay() { otx_osd_texto(nullptr); }
 
  protected:
   void OnDraw(ImGuiIO& io) override {
-    if (ImGui::IsKeyPressed(ImGuiKey_F10, false)) {
+    if (port::osd::F10Pressed()) {
       shown_ = !shown_;
       if (!shown_) otx_osd_texto(nullptr);
       last_text_ = Clock::time_point{};
@@ -184,6 +190,6 @@ class FpsOverlay final : public rex::ui::ImGuiDialog {
   Clock::time_point last_time_, last_text_{};
   uint64_t last_frames_ = 0;
   double fps_ = 0;
-  bool full_;
-  bool shown_ = true;
+  bool full_;  // the whole meter, or only the frame rate (mostrar_fps alone)
+  bool shown_;
 };
