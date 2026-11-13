@@ -57,7 +57,7 @@ DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos 
 ## Estado dos testes
 
 - Episódios 1, 2 e 3 completos, com as QTEs, os contra-ataques e o tiro feitos pelo controle roteirizado e pelo leitor de avisos da tela (`scripts/qte.py`).
-- Em 2x (1440p), com os render targets por ROV (o padrão dele em placas NVIDIA): 60 fps cravados nas lutas com a GPU em 45% (RTX 5080), 120 fps nas lutas (média 118,6) e 3x (4K) a 60 (média 59,5). Pelo caminho RTV, o mesmo trecho pedia 76% a 99% da GPU e caía para 48-54 fps; a imagem é a mesma nos dois.
+- Em 2x (1440p), pelo caminho RTV (o padrão, desde que corrigimos o tom esverdeado que o ROV dava ao escuro de alguns modelos), na engine 1.0.1: Episódio 2 inteiro (cutscenes, QTEs e lutas), 9 minutos, média de 52,1, com quedas a cerca de 25 fps nos trechos mais pesados (GPU em 75% de média e 100% nesses trechos). O caminho ROV (`alvos=rov`) pede menos da GPU, mas o tom esverdeado volta.
 - Som, saves e a troca de episódios funcionam.
 
 ## Plataformas
@@ -79,11 +79,11 @@ DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos 
 
 ## Desempenho medido
 
-FPS de jogo. **Só colocamos o que foi medido**, e com **um jogo só rodando** (com outra carga junto, o desempenho pode cair bastante). Foram medidos no runtime anterior; na engine 1.0.0 a saída da GPU saiu **idêntica quadro a quadro** nos 4 ports e o boot não falhou, mas os FPS **ainda não foram remedidos**.
+FPS de jogo. **Só colocamos o que foi medido**, e com **um jogo só rodando** (com outra carga junto, o desempenho pode cair bastante). Os números de 2x são da engine 1.0.1 (a saída da GPU é **idêntica quadro a quadro** à da 1.0.0 nos 4 ports); o que veio do runtime anterior está indicado como tal.
 
 | Máquina | CPU | GPU | FPS |
 |---|---|---|---|
-| **PC 1** | Ryzen 7 9800X3D | RTX 5080 | 2x (1440p): **60 cravados** nas lutas (GPU em 45%); **120**: média 118,6 nas lutas e ~119 no Episódio 2 inteiro; 3x (4K) a 60 (média 59,5). Pelo caminho RTV cai para 48–54 |
+| **PC 1** | Ryzen 7 9800X3D | RTX 5080 | 2x (1440p): **média 52** no Episódio 2 (lutas e cutscenes; quedas a ~25 nos trechos mais pesados, GPU em 75–100%) na engine 1.0.1, pelo caminho RTV (o padrão desde a correção do tom esverdeado); 1x deve ser mais leve, mas não foi medido |
 | **PC 2** | Core i5-11400F | RX 9060 XT | não medido |
 | **Notebook** | Core i5-10300H (4/8) | GTX 1650 | não medido |
 | **Portátil** | Legion Go S (Linux) | Radeon 780M | não suportado |
