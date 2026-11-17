@@ -7,7 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 NAME = next(ROOT.glob('*_manifest.toml')).name[:-len('_manifest.toml')]
-BUILD = ROOT / 'out' / 'build' / 'win-amd64-release'
+BUILD = ROOT / 'out' / 'build' / os.environ.get('PORT_BUILD', 'win-amd64-release')  # PORT_BUILD=otx: the engine's build
 EXE = BUILD / f'{NAME}.exe'
 CAPTURE = BUILD / 'tela.bmp'  # the game's picture (PORT_CAPTURA), the scripts' eyes
 GENERATED = ROOT / 'generated' / 'default'

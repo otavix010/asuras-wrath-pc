@@ -16,6 +16,7 @@
   <a href="#plataformas">Plataformas</a> ·
   <a href="#requisitos">Requisitos</a> ·
   <a href="#desempenho-medido">Desempenho</a> ·
+  <a href="#dlcs">DLCs</a> ·
   <a href="#perguntas-frequentes">Perguntas frequentes</a> ·
   <a href="#gerar-à-mão-sem-o-launcher">Gerar à mão (sem o launcher)</a> ·
   <a href="#opções">Opções</a> ·
@@ -31,7 +32,7 @@ Port do **Asura's Wrath** (Xbox 360) por **recompilação estática**: o código
 
 **Nada do jogo vem neste repositório.** O port é gerado no seu PC a partir da sua própria cópia (a imagem `.iso` do disco). O código traduzido também é gerado aí e nunca é distribuído.
 
-O runtime é a **Otavix Engine 360 1.0.0** (privada): o gerador baixa o pacote pronto do servidor do launcher e confere o SHA-256. Ela descende do ReXGlue e do Xenia (BSD-3, veja os Créditos) e traz o AMD FidelityFX e as correções do port; os avisos de licença vão no pacote.
+O runtime é a **Otavix Engine 360** (privada): o gerador baixa o pacote pronto do servidor do launcher e confere o SHA-256. Ela descende do ReXGlue e do Xenia (BSD-3, veja os Créditos) e traz o AMD FidelityFX e as correções do port; os avisos de licença vão no pacote.
 
 O jeito mais fácil de jogar é pelo [Otavix Launcher](https://github.com/otavix010/otavix-launcher), que baixa este port, pede a sua `.iso`, gera tudo e cuida das opções.
 
@@ -59,6 +60,7 @@ DLSS e XeSS não entram: os dois precisam de vetores de movimento, que os jogos 
 - Episódios 1, 2 e 3 completos, com as QTEs, os contra-ataques e o tiro feitos pelo controle roteirizado e pelo leitor de avisos da tela (`scripts/qte.py`).
 - Em 2x (1440p), pelo caminho RTV (o padrão, desde que corrigimos o tom esverdeado que o ROV dava ao escuro de alguns modelos), na engine 1.0.1: Episódio 2 inteiro (cutscenes, QTEs e lutas), 9 minutos, média de 52,1, com quedas a cerca de 25 fps nos trechos mais pesados (GPU em 75% de média e 100% nesses trechos). O caminho ROV (`alvos=rov`) pede menos da GPU, mas o tom esverdeado volta.
 - Som, saves e a troca de episódios funcionam.
+- DLCs (engine 1.0.6, lidas direto dos pacotes): as cinco aparecem no menu de episódios e abrem. Rodadas com o controle roteirizado, sem erro no log e sem o jogo cair: Episode 11.5 (7 minutos de vídeo e QTEs, 60 fps), Episode 15.5 (até a primeira luta), Episódio 19 da Parte IV (25 minutos, cutscenes e a luta) e Lost Episode 1 (luta contra o Ryu, 60 fps nos 10 minutos medidos). O som das DLCs ainda não foi medido. Nenhum deles foi levado até os créditos (o controle roteirizado perde as lutas), e o Lost Episode 2, que só abre depois de vencer o 1, e os episódios 20 a 22 ainda não foram abertos: se algo falhar neles, use "Reportar problema".
 
 ## Plataformas
 
@@ -90,9 +92,19 @@ FPS de jogo. **Só colocamos o que foi medido**, e com **um jogo só rodando** (
 
 DLSS e XeSS não existem para estes jogos (o Xbox 360 não fornece vetores de movimento); o FSR e o CAS atuam só na saída.
 
+## DLCs
+
+O port lê as DLCs do **Asura's Wrath** direto dos pacotes da Xbox Live, se você os tiver: **Episode 11.5**, **Episode 15.5**, **Episode Pack: Part IV** (o final verdadeiro, episódios 19 a 22), **Lost Episode 1** e **Lost Episode 2**.
+
+- **O jeito mais fácil:** deixe as DLCs na mesma pasta da `.iso` do jogo (ou numa subpasta dela) antes de gerar. O gerador as acha sozinho, soltas ou compactadas: `.zip`, `.7z`, `.rar` e os outros formatos que o Windows abre são extraídos para a pasta `dlc` do port; os pacotes soltos são lidos onde estão. Se as DLCs chegarem depois, é só gerar de novo (leva segundos: a tradução e a compilação não se repetem).
+- Os pacotes são os arquivos sem extensão (nomes de 42 letras e números, como `8A6811EC...CA43`) que ficam em `Content\0000000000000000\43430817\00000002` num HD de Xbox 360.
+- Guarda as DLCs em outro lugar? No launcher: **Opções avançadas → Jogo → DLCs (opcional)** e escolha a pasta (vale qualquer subpasta; aqui os pacotes precisam estar extraídos). À mão: `dlc_root = 'D:\Jogos\Asura DLC'` no `opcoes.toml`, ou `--dlc_root`.
+- O jogo lê os pacotes onde estão, sem alterar nada: deixe-os no lugar.
+- Ao passar da tela de título o jogo procura as DLCs ("Checking for downloadable content...") e avisa "A new episode is available"; os episódios aparecem no **Episode Menu**, cada um na sua parte, e os Lost Episodes numa parte própria.
+- O Title Update do jogo não é necessário e não é usado.
+
 ## Problemas conhecidos
 
-- **DLC não suportada** (report 1092, em espera: faltam os pacotes para testar).
 - A 120 fps, os QTEs de apertar rápido podem ficar mais difíceis.
 - Tom esverdeado em algumas cenas (report 307): falta trazer uma correção do Xenia Canary.
 
@@ -128,6 +140,7 @@ Ficam em `asuraswrath.toml` ao lado do executável, ou no arquivo indicado pela 
 | `zona_morta_esquerda`, `zona_morta_direita` | 0 a 50 (%) | 0 |
 | `user_language` | 1 inglês, 3 alemão, 4 francês, 5 espanhol, 6 italiano, 2 japonês | 1 |
 | `iso` | caminho da `.iso` | — |
+| `dlc_root` | pasta com os pacotes de DLC (veja [DLCs](#dlcs)) | — |
 
 ## Perguntas frequentes
 

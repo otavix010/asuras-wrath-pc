@@ -4,6 +4,17 @@ O Otavix Launcher mostra este arquivo na página "Novidades" do jogo. Cada atual
 "## <data> · <versão>" e o texto em português (### pt), inglês (### en) e, quando houver, espanhol (### es).
 As mais novas ficam em cima.
 
+## 17/11/2026 · engine 1.0.6
+### pt
+- **DLCs:** o port agora lê os pacotes de conteúdo extra do Asura's Wrath (Episódios 11.5 e 15.5, Parte IV e os Episódios Perdidos 1 e 2), se você os tiver. Deixe-os na mesma pasta da .iso do jogo, soltos ou compactados (.zip, .7z, .rar): o gerador os acha sozinho e os episódios aparecem no menu de episódios. Quem os guarda em outro lugar indica a pasta em Opções avançadas → Jogo → DLCs (opcional). Detalhes na seção DLCs do README.
+- **Ícone:** o executável do jogo passa a ter o ícone do próprio jogo, tirado da sua cópia: ele aparece no Explorer e nos atalhos, e não só na janela.
+### en
+- **DLC:** the port now reads Asura's Wrath's extra content packages (Episodes 11.5 and 15.5, Part IV and Lost Episodes 1 and 2), if you have them. Leave them in the same folder as the game's .iso, loose or compressed (.zip, .7z, .rar): the generator finds them by itself and the episodes show up in the episode menu. If you keep them elsewhere, point to the folder in Advanced options → Game → DLC (optional). Details in the README's DLC section.
+- **Icon:** the game's executable now carries the game's own icon, taken from your copy: it shows in Explorer and in shortcuts, not only on the window.
+### es
+- **DLC:** el port ahora lee los paquetes de contenido extra de Asura's Wrath (Episodios 11.5 y 15.5, Parte IV y los Episodios Perdidos 1 y 2), si los tienes. Déjalos en la misma carpeta que la .iso del juego, sueltos o comprimidos (.zip, .7z, .rar): el generador los encuentra solo y los episodios aparecen en el menú de episodios. Si los guardas en otro lugar, indica la carpeta en Opciones avanzadas → Juego → DLC (opcional). Detalles en la sección DLCs del README.
+- **Icono:** el ejecutable del juego ahora lleva el icono del propio juego, sacado de tu copia: aparece en el Explorador y en los accesos directos, y no solo en la ventana.
+
 ## 16/11/2026 · engine 1.0.5
 ### pt
 - **Abertura:** a janela do jogo continua respondendo enquanto os shaders são preparados na abertura. Em computadores mais fracos essa etapa leva minutos, e o Windows chegava a oferecer fechar o jogo (erro 0xCFFFFFFF).

@@ -18,3 +18,5 @@ folha*.png
 filme/
 qte/
 comparar/
+# the player's extra content packages, taken out of compressed files by the generator
+dlc/
