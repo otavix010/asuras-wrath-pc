@@ -4,6 +4,20 @@ O Otavix Launcher mostra este arquivo na página "Novidades" do jogo. Cada atual
 "## <data> · <versão>" e o texto em português (### pt), inglês (### en) e, quando houver, espanhol (### es).
 As mais novas ficam em cima.
 
+## 18/11/2026 · gerador
+### pt
+- **Gerador:** o download das ferramentas continua de onde parou quando a conexão cai, em vez de falhar no meio.
+- **Gerador:** o Visual Studio 2019 (e os anteriores) não serve para compilar o port e era aceito por engano, o que terminava em erro de compilação; agora o gerador pede o Visual Studio 2022 Build Tools e mostra o comando para instalar.
+- **DLCs:** arquivos compactados de DLC de outros jogos que estejam na pasta da .iso são deixados de lado, sem serem extraídos.
+### en
+- **Generator:** the tools download resumes where it stopped when the connection drops, instead of failing midway.
+- **Generator:** Visual Studio 2019 (and older) cannot build the port and was accepted by mistake, which ended in a build error; the generator now asks for Visual Studio 2022 Build Tools and shows the command to install it.
+- **DLC:** compressed DLC files of other games lying in the .iso folder are left alone, not extracted.
+### es
+- **Generador:** la descarga de las herramientas continúa donde se quedó cuando la conexión se cae, en lugar de fallar a la mitad.
+- **Generador:** Visual Studio 2019 (y los anteriores) no sirve para compilar el port y se aceptaba por error, lo que terminaba en un error de compilación; ahora el generador pide Visual Studio 2022 Build Tools y muestra el comando para instalarlo.
+- **DLC:** los archivos comprimidos de DLC de otros juegos que estén en la carpeta de la .iso se dejan de lado, sin extraerlos.
+
 ## 17/11/2026 · engine 1.0.6
 ### pt
 - **DLCs:** o port agora lê os pacotes de conteúdo extra do Asura's Wrath (Episódios 11.5 e 15.5, Parte IV e os Episódios Perdidos 1 e 2), se você os tiver. Deixe-os na mesma pasta da .iso do jogo, soltos ou compactados (.zip, .7z, .rar): o gerador os acha sozinho e os episódios aparecem no menu de episódios. Quem os guarda em outro lugar indica a pasta em Opções avançadas → Jogo → DLCs (opcional). Detalhes na seção DLCs do README.
