@@ -17,6 +17,7 @@
   <a href="#requisitos">Requisitos</a> ·
   <a href="#desempenho-medido">Desempenho</a> ·
   <a href="#dlcs">DLCs</a> ·
+  <a href="#teclado-e-mouse">Teclado e mouse</a> ·
   <a href="#perguntas-frequentes">Perguntas frequentes</a> ·
   <a href="#gerar-à-mão-sem-o-launcher">Gerar à mão (sem o launcher)</a> ·
   <a href="#opções">Opções</a> ·
@@ -102,6 +103,45 @@ O port lê as DLCs do **Asura's Wrath** direto dos pacotes da Xbox Live, se voc�
 - O jogo lê os pacotes onde estão, sem alterar nada: deixe-os no lugar.
 - Ao passar da tela de título o jogo procura as DLCs ("Checking for downloadable content...") e avisa "A new episode is available"; os episódios aparecem no **Episode Menu**, cada um na sua parte, e os Lost Episodes numa parte própria.
 - O Title Update do jogo não é necessário e não é usado.
+
+<!-- teclado e mouse: gerado por teclas_360.py -->
+## Teclado e mouse
+
+O jogo aceita teclado e mouse junto com o controle (ou sem ele): cada botão do controle do Xbox 360 tem uma tecla. O movimento do mouse é o analógico direito: um movimento rápido é um toque no analógico e um movimento contínuo o mantém inclinado. Os botões do mouse entram no mapa de teclas. O cursor fica preso na janela depois que você usa uma tecla do jogo; Alt+Tab solta.
+
+Para trocar as teclas, desligar o teclado ou o mouse e ajustar a sensibilidade: **Opções avançadas → Controles** no launcher (clique em **Trocar** e aperte a tecla nova). À mão, no `opcoes.toml`: `kbm`, `kbm_mouse`, `mnk_sensitivity_percent` e uma tabela `[keybind]` com as teclas de cada botão (`a = "space enter"`; os nomes são os das teclas pela posição, e `mouse1` a `mouse5`).
+
+Teclas padrão:
+
+| Botão do controle | Tecla |
+|---|---|
+| Analógico esquerdo ↑ (andar) | W |
+| Analógico esquerdo ↓ (andar) | S |
+| Analógico esquerdo ← (andar) | A |
+| Analógico esquerdo → (andar) | D |
+| A | Espaço / Enter |
+| B | E / Backspace |
+| X | Mouse 1 / J |
+| Y | Mouse 2 / K |
+| LB | Q |
+| RB | R |
+| LT | Shift esquerdo |
+| RT | F |
+| Start (pausa) | Esc |
+| Back | Tab |
+| Direcional ↑ | ↑ |
+| Direcional ↓ | ↓ |
+| Direcional ← | ← |
+| Direcional → | → |
+| Analógico direito ↑ (câmera) | Num 8 |
+| Analógico direito ↓ (câmera) | Num 2 |
+| Analógico direito ← (câmera) | Num 4 |
+| Analógico direito → (câmera) | Num 6 |
+| Analógico esquerdo (clique) | Z |
+| Analógico direito (clique) | Mouse 3 / C |
+
+F3, F4, F7, F10 e a tecla ao lado do 1 (crase) são atalhos do próprio port e ficam fora do mapa.
+<!-- fim do teclado e mouse -->
 
 ## Problemas conhecidos
 
