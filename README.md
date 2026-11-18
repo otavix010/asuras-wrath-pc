@@ -119,16 +119,16 @@ Teclas padrão:
 | Analógico esquerdo ↓ (andar) | S |
 | Analógico esquerdo ← (andar) | A |
 | Analógico esquerdo → (andar) | D |
-| A | Espaço / Enter |
-| B | E / Backspace |
-| X | Mouse 1 / J |
-| Y | Mouse 2 / K |
-| LB | Q |
-| RB | R |
-| LT | Shift esquerdo |
-| RT | F |
+| A (pular) | Espaço / Enter |
+| B (ataque) | Mouse 1 / E / Backspace |
+| X (tiro) | F |
+| Y (ataque forte) | Mouse 2 |
+| LB (travar a mira) | Q |
+| RB (esquiva) | Shift esquerdo |
+| LT (modo Unlimited) | X |
+| RT (Burst) | R |
 | Start (pausa) | Esc |
-| Back | Tab |
+| Back (pular o filme) | Tab |
 | Direcional ↑ | ↑ |
 | Direcional ↓ | ↓ |
 | Direcional ← | ← |
@@ -138,7 +138,7 @@ Teclas padrão:
 | Analógico direito ← (câmera) | Num 4 |
 | Analógico direito → (câmera) | Num 6 |
 | Analógico esquerdo (clique) | Z |
-| Analógico direito (clique) | Mouse 3 / C |
+| Analógico direito (clique) (centralizar a câmera) | Mouse 3 / C |
 
 F3, F4, F7, F10 e a tecla ao lado do 1 (crase) são atalhos do próprio port e ficam fora do mapa.
 <!-- fim do teclado e mouse -->
