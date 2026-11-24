@@ -1,6 +1,7 @@
 titulo=Asura's Wrath
 versao=Asura's Wrath (World)
 sha1_xex=bcaec56eabad135071ee879b4bbcc6aa1e3362b8
+iso_ref=8738846720:4e9c256be8cf46a46d6e4dd46b738672e892fc74
 title_id=43430817
 cor=210,110,40
 marca=Capcom
